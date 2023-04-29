@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace TaskManagmentApi.Models
+namespace TaskManagmentApi.Services.DTOs
 {
-    public class RegisterModel
+    public class RegisterDTO
     {
         [Required(ErrorMessage = "User Name is required")]
         public string? FirstName { get; set; }
@@ -13,6 +18,7 @@ namespace TaskManagmentApi.Models
         [Required(ErrorMessage = "User Name is required")]
         public string? Username { get; set; }
         public string? PhoneNumber { get; set; }
+        public string UserRole { get; set; }
 
         [EmailAddress]
         [Required(ErrorMessage = "Email is required")]

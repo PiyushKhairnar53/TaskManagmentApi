@@ -58,7 +58,6 @@ namespace TaskManagmentApi.Data.DBContext
                .HasForeignKey(e => e.StatusId)
                .IsRequired(false);
 
-          
 
         }
     }

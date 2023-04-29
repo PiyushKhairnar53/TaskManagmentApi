@@ -4,7 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TaskManagmentApi.Data.Models;
 using TaskManagmentApi.Models;
+using TaskManagmentApi.Services.DTOs;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,12 +16,12 @@ namespace TaskManagmentApi.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
         public AuthenticationController(
-            UserManager<IdentityUser> userManager,
+            UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration)
         {
@@ -65,14 +67,18 @@ namespace TaskManagmentApi.Controllers
         
         [HttpPost]
         [Route("RegisterManager")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterManager([FromBody] RegisterDTO model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
-            IdentityUser user = new()
+            User user = new()
             {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                UserRole = model.UserRole,
+                PhoneNumber = model.PhoneNumber,
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
@@ -97,13 +103,13 @@ namespace TaskManagmentApi.Controllers
 
         [HttpPost]
         [Route("RegisterDeveloper")]
-        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterDeveloper([FromBody] RegisterDTO model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
-            IdentityUser user = new()
+            User user = new()
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
@@ -126,19 +132,19 @@ namespace TaskManagmentApi.Controllers
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+        //private JwtSecurityToken GetToken(List<Claim> authClaims)
+        //{
+        //    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
+        //    var token = new JwtSecurityToken(
+        //        issuer: _configuration["JWT:ValidIssuer"],
+        //        audience: _configuration["JWT:ValidAudience"],
+        //        expires: DateTime.Now.AddHours(3),
+        //        claims: authClaims,
+        //        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        //        );
 
-            return token;
-        }
+        //    return token;
+        //}
     }
 }
