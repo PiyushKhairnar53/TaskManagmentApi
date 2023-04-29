@@ -12,11 +12,10 @@ namespace TaskManagmentApi.Services.DTOs
     {
         public int Id { get; set; }
 
-        [Required]
         public string Bio { get; set; } = null!;
 
         [Required]
-        public User User { get; set; }
+        public string UserId { get; set; }
 
     }
 }

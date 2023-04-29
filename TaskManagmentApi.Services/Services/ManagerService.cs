@@ -12,7 +12,7 @@ namespace TaskManagmentApi.Services.Services
 {
     public interface IManagerService
     {
-        public Manager AddManager(ManagerDTO matter);
+        public Manager AddManager(String userId);
 
     }
     public class ManagerService : IManagerService
@@ -30,15 +30,14 @@ namespace TaskManagmentApi.Services.Services
         //}
 
 
-        public Manager AddManager(ManagerDTO matter)
+        public Manager AddManager(String userId)
         {
             try
             {
                 var newManager = new Manager
                 {
-                    Id = matter.Id,
-                    Bio = matter.Bio,
-                    User = matter.User,
+                    Id = 0,
+                    UserId = userId
                 };
                 _taskDBContext.Managers.Add(newManager);
                 _taskDBContext.SaveChanges();
