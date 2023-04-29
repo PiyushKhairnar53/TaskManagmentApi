@@ -37,18 +37,18 @@ namespace TaskManagmentApi.Data.DBContext
             .HasKey(t => t.Id)
             .HasName("TaskId");
 
-         
-            //modelBuilder.Entity<Manager>()
-            //   .HasMany(e => e.Tasks)
-            //   .WithOne(e => e.Manager)
-            //   .HasForeignKey(e => e.ManagerId)
-            //   .IsRequired(false);
 
-            //modelBuilder.Entity<Developer>()
-            //   .HasMany(e => e.Tasks)
-            //   .WithOne(e => e.Developer)
-            //   .HasForeignKey(e => e.DeveloperId)
-            //   .IsRequired(false);
+            modelBuilder.Entity<Manager>()
+               .HasMany(e => e.Tasks)
+               .WithOne(e => e.Manager)
+               .HasForeignKey(e => e.ManagerId)
+               .IsRequired(false);
+
+            modelBuilder.Entity<Developer>()
+               .HasMany(e => e.Tasks)
+               .WithOne(e => e.Developer)
+               .HasForeignKey(e => e.DeveloperId)
+               .IsRequired(false);
 
             modelBuilder.Entity<Status>()
                .HasMany(e => e.Tasks)

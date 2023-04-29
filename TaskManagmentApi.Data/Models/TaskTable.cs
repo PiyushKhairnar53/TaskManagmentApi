@@ -18,13 +18,13 @@ namespace TaskManagmentApi.Data.Models
         public string Priority { get; set; }
 
 
-        //[Required]
-        //public string ManagerId { get; set; }
-        //public Manager Manager { get; set; }
+        [Required]
+        public string ManagerId { get; set; }
+        public Manager Manager { get; set; }
 
-        //[Required]
-        //public int DeveloperId { get; set; }
-        //public Developer Developer { get; set; }
+        [Required]
+        public string DeveloperId { get; set; }
+        public Developer Developer { get; set; }
 
         [Required]
         public int StatusId { get; set; }

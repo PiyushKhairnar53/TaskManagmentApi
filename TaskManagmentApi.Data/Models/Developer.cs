@@ -15,7 +15,7 @@ namespace TaskManagmentApi.Data.Models
         //public int ManagerPositionId { get; set; }
         public string? Bio { get; set; }
         public User User { get; set; }
-        //public ICollection<TaskTable> Tasks { get; set; }
+        public ICollection<TaskTable> Tasks { get; set; }
         public int IsActive { get; set; }
 
     }

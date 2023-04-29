@@ -12,8 +12,8 @@ using TaskManagmentApi.Data.DBContext;
 namespace TaskManagmentApi.Data.Migrations
 {
     [DbContext(typeof(TaskDBContext))]
-    [Migration("20230429192318_UserManagerMigration-mg3")]
-    partial class UserManagerMigrationmg3
+    [Migration("20230429200955_TaskManagerMigration-mg3")]
+    partial class TaskManagerMigrationmg3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -231,8 +231,16 @@ namespace TaskManagmentApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DeveloperId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("EstimatedTime")
                         .HasColumnType("int");
+
+                    b.Property<string>("ManagerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Priority")
                         .IsRequired()
@@ -253,6 +261,10 @@ namespace TaskManagmentApi.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("TaskId");
+
+                    b.HasIndex("DeveloperId");
+
+                    b.HasIndex("ManagerId");
 
                     b.HasIndex("StatusId");
 
@@ -417,11 +429,33 @@ namespace TaskManagmentApi.Data.Migrations
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.TaskTable", b =>
                 {
+                    b.HasOne("TaskManagmentApi.Data.Models.Developer", "Developer")
+                        .WithMany("Tasks")
+                        .HasForeignKey("DeveloperId");
+
+                    b.HasOne("TaskManagmentApi.Data.Models.Manager", "Manager")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ManagerId");
+
                     b.HasOne("TaskManagmentApi.Data.Models.Status", "Status")
                         .WithMany("Tasks")
                         .HasForeignKey("StatusId");
 
+                    b.Navigation("Developer");
+
+                    b.Navigation("Manager");
+
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.Developer", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.Manager", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Status", b =>
