@@ -12,8 +12,8 @@ using TaskManagmentApi.Data.DBContext;
 namespace TaskManagmentApi.Data.Migrations
 {
     [DbContext(typeof(TaskDBContext))]
-    [Migration("20230429110735_UserIdMigration")]
-    partial class UserIdMigration
+    [Migration("20230429192318_UserManagerMigration-mg3")]
+    partial class UserManagerMigrationmg3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,46 +160,34 @@ namespace TaskManagmentApi.Data.Migrations
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Developer", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("DeveloperId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Developers");
                 });
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Manager", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("IsActive")
+                        .HasColumnType("int");
 
                     b.HasKey("Id")
                         .HasName("ManagerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Managers");
                 });
@@ -243,13 +231,7 @@ namespace TaskManagmentApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DeveloperId")
-                        .HasColumnType("int");
-
                     b.Property<int>("EstimatedTime")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Priority")
@@ -271,10 +253,6 @@ namespace TaskManagmentApi.Data.Migrations
 
                     b.HasKey("Id")
                         .HasName("TaskId");
-
-                    b.HasIndex("DeveloperId");
-
-                    b.HasIndex("ManagerId");
 
                     b.HasIndex("StatusId");
 
@@ -351,8 +329,7 @@ namespace TaskManagmentApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("UserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -420,7 +397,9 @@ namespace TaskManagmentApi.Data.Migrations
                 {
                     b.HasOne("TaskManagmentApi.Data.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -428,46 +407,32 @@ namespace TaskManagmentApi.Data.Migrations
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Manager", b =>
                 {
                     b.HasOne("TaskManagmentApi.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne("Manager")
+                        .HasForeignKey("TaskManagmentApi.Data.Models.Manager", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.TaskTable", b =>
                 {
-                    b.HasOne("TaskManagmentApi.Data.Models.Developer", "Developer")
-                        .WithMany("Tasks")
-                        .HasForeignKey("DeveloperId");
-
-                    b.HasOne("TaskManagmentApi.Data.Models.Manager", "Manager")
-                        .WithMany("Tasks")
-                        .HasForeignKey("ManagerId");
-
                     b.HasOne("TaskManagmentApi.Data.Models.Status", "Status")
                         .WithMany("Tasks")
                         .HasForeignKey("StatusId");
 
-                    b.Navigation("Developer");
-
-                    b.Navigation("Manager");
-
                     b.Navigation("Status");
-                });
-
-            modelBuilder.Entity("TaskManagmentApi.Data.Models.Developer", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("TaskManagmentApi.Data.Models.Manager", b =>
-                {
-                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Status", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.User", b =>
+                {
+                    b.Navigation("Manager")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

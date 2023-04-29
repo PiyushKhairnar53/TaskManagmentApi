@@ -11,10 +11,11 @@ namespace TaskManagmentApi.Data.DBContext
     {
         public TaskDBContext(DbContextOptions options) : base(options){ }
 
-        public DbSet<Manager> Managers { get; set; }
-        public DbSet<Developer> Developers { get; set; }
         public DbSet<Status> Status { get; set; }
         public DbSet<TaskTable> Tasks { get; set; }
+        public DbSet<Manager> Managers { get; set; }
+        public DbSet<Developer> Developers { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,21 +37,18 @@ namespace TaskManagmentApi.Data.DBContext
             .HasKey(t => t.Id)
             .HasName("TaskId");
 
-            modelBuilder.Entity<User>()
-            .HasKey(u => u.Id)
-            .HasName("UserId");
+         
+            //modelBuilder.Entity<Manager>()
+            //   .HasMany(e => e.Tasks)
+            //   .WithOne(e => e.Manager)
+            //   .HasForeignKey(e => e.ManagerId)
+            //   .IsRequired(false);
 
-            modelBuilder.Entity<Manager>()
-               .HasMany(e => e.Tasks)
-               .WithOne(e => e.Manager)
-               .HasForeignKey(e => e.ManagerId)
-               .IsRequired(false);
-
-            modelBuilder.Entity<Developer>()
-               .HasMany(e => e.Tasks)
-               .WithOne(e => e.Developer)
-               .HasForeignKey(e => e.DeveloperId)
-               .IsRequired(false);
+            //modelBuilder.Entity<Developer>()
+            //   .HasMany(e => e.Tasks)
+            //   .WithOne(e => e.Developer)
+            //   .HasForeignKey(e => e.DeveloperId)
+            //   .IsRequired(false);
 
             modelBuilder.Entity<Status>()
                .HasMany(e => e.Tasks)
@@ -58,6 +56,15 @@ namespace TaskManagmentApi.Data.DBContext
                .HasForeignKey(e => e.StatusId)
                .IsRequired(false);
 
+            //modelBuilder.Entity<Manager>()
+            //  .HasOne(e => e.User)
+            //  .WithOne(e => e.Manager)
+            //  .HasForeignKey<Manager>(e=>e.Id);
+
+            modelBuilder.Entity<User>()
+                .HasOne<Manager>(s => s.Manager)
+                .WithOne(c => c.User)
+                .HasForeignKey<Manager>(ad => ad.Id);
 
         }
     }

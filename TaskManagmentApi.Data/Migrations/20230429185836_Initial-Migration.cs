@@ -52,7 +52,7 @@ namespace TaskManagmentApi.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("UserId", x => x.Id);
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -178,40 +178,38 @@ namespace TaskManagmentApi.Data.Migrations
                 name: "Developers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("DeveloperId", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Developers_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Developers_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Managers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("ManagerId", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Managers_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Managers_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -223,8 +221,6 @@ namespace TaskManagmentApi.Data.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ManagerId = table.Column<int>(type: "int", nullable: false),
-                    DeveloperId = table.Column<int>(type: "int", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     EstimatedTime = table.Column<int>(type: "int", nullable: false),
                     ActualTime = table.Column<int>(type: "int", nullable: false),
@@ -236,16 +232,6 @@ namespace TaskManagmentApi.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("TaskId", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Tasks_Developers_DeveloperId",
-                        column: x => x.DeveloperId,
-                        principalTable: "Developers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Tasks_Managers_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "Managers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Tasks_Status_StatusId",
                         column: x => x.StatusId,
@@ -293,26 +279,6 @@ namespace TaskManagmentApi.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Developers_UserId1",
-                table: "Developers",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Managers_UserId1",
-                table: "Managers",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_DeveloperId",
-                table: "Tasks",
-                column: "DeveloperId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ManagerId",
-                table: "Tasks",
-                column: "ManagerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Tasks_StatusId",
                 table: "Tasks",
                 column: "StatusId");
@@ -337,22 +303,22 @@ namespace TaskManagmentApi.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Tasks");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
                 name: "Developers");
 
             migrationBuilder.DropTable(
                 name: "Managers");
 
             migrationBuilder.DropTable(
-                name: "Status");
+                name: "Tasks");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Status");
         }
     }
 }

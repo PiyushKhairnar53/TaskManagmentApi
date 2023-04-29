@@ -22,20 +22,37 @@ namespace TaskManagmentApi.Controllers
         private readonly IConfiguration _configuration;
 
         private readonly IManagerService _managerService;
-
+        private readonly IDeveloperService _developerService;
 
         public AuthenticationController(
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
-            IManagerService managerService)
+            IManagerService managerService,
+            IDeveloperService developerService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _managerService = managerService;
+            _developerService = developerService;
         }
 
+        [HttpGet]
+        [Route("GetAllManagers")]
+        public IEnumerable<ManagerDTO> GetAllManagers()
+        {
+            IEnumerable<ManagerDTO> managers = _managerService.GetAllManagers();
+            return managers;
+        }
+
+        [HttpGet]
+        [Route("GetAllDevelopers")]
+        public IEnumerable<Developer> GetAllDevelopers()
+        {
+            IEnumerable<Developer> managers = _developerService.GetAllDevelopers();
+            return managers;
+        }
 
         [HttpPost]
         [Route("login")]
@@ -95,21 +112,25 @@ namespace TaskManagmentApi.Controllers
                 };
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
                 if (!result.Succeeded)
+                {
                     return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-
-                if (!await _roleManager.RoleExistsAsync(UserRoles.Manager))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(UserRoles.Manager));
                 }
-
-                if (await _roleManager.RoleExistsAsync(UserRoles.Manager))
+                else
                 {
-                    await _userManager.AddToRoleAsync(user, UserRoles.Manager);
+                    if (!await _roleManager.RoleExistsAsync(UserRoles.Manager))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(UserRoles.Manager));
+                    }
+
+                    if (await _roleManager.RoleExistsAsync(UserRoles.Manager))
+                    {
+                        await _userManager.AddToRoleAsync(user, UserRoles.Manager);
+                    }
+
+                    Manager newManager = _managerService.AddManager(user.Id);
+
+                    return Ok(new Response { Status = "Success", Message = "User created successfully! "});
                 }
-
-                _managerService.AddManager(user.Id);
-
-                return Ok(new Response { Status = "Success", Message = "User created successfully!" });
             }
             return BadRequest(new Response { Status = "Failed", Message = "Please enter valid details!" });
         }
@@ -117,45 +138,48 @@ namespace TaskManagmentApi.Controllers
 
         [HttpPost]
         [Route("RegisterDeveloper")]
-        public async Task<IActionResult> RegisterDeveloper([FromBody] RegisterDTO model)
+        public async Task<IActionResult> RegisterDeveloper([FromBody] RegisterDTO registerDto)
         {
-            var userExists = await _userManager.FindByNameAsync(model.Username);
+            var userExists = await _userManager.FindByNameAsync(registerDto.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
 
-            User user = new()
+            if (!string.IsNullOrEmpty(registerDto.FirstName) && !string.IsNullOrEmpty(registerDto.LastName) && !string.IsNullOrEmpty(registerDto.Email))
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                UserRole = "Developer",
-                PhoneNumber = model.PhoneNumber,
-                Email = model.Email,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.Username
-            };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-            }
-            else
-            {
-                if (!await _roleManager.RoleExistsAsync(UserRoles.Developer))
+                User user = new()
                 {
-                    await _roleManager.CreateAsync(new IdentityRole(UserRoles.Developer));
-                }
-
-                if (await _roleManager.RoleExistsAsync(UserRoles.Developer))
+                    FirstName = registerDto.FirstName,
+                    LastName = registerDto.LastName,
+                    UserRole = "Developer",
+                    PhoneNumber = registerDto.PhoneNumber,
+                    Email = registerDto.Email,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    UserName = registerDto.Username
+                };
+                var result = await _userManager.CreateAsync(user, registerDto.Password);
+                if (!result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, UserRoles.Developer);
+                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
                 }
-              
-                return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+                else
+                {
+                    if (!await _roleManager.RoleExistsAsync(UserRoles.Developer))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(UserRoles.Developer));
+                    }
 
+                    if (await _roleManager.RoleExistsAsync(UserRoles.Developer))
+                    {
+                        await _userManager.AddToRoleAsync(user, UserRoles.Developer);
+                    }
+                    Developer developer = _developerService.AddDeveloper(user.Id);
+
+                    return Ok(new Response { Status = "Success", Message = "User created successfully! - "+developer.Id });
+                }
             }
-
+            return BadRequest(new Response { Status = "Failed", Message = "Please enter valid details!" });
         }
 
         private JwtSecurityToken GetToken(List<Claim> authClaims)

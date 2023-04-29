@@ -22,5 +22,8 @@ namespace TaskManagmentApi.Data.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
+        public Manager Manager { get; set; }
+        //public Developer Developer { get; set; }
+
     }
 }

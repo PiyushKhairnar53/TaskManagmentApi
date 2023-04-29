@@ -16,7 +16,12 @@ namespace TaskManagmentApi.Services.Mappers
             return new ManagerDTO
             {
                 Id = entity.Id,
-                UserId = entity.UserId,
+                Bio = entity.Bio,
+                FirstName = entity.User.FirstName,
+                LastName = entity.User.LastName,
+                UserRole = entity.User.UserRole,
+                PhoneNumber = entity.User.PhoneNumber,
+                Email = entity.User.Email
             };
         }
     }

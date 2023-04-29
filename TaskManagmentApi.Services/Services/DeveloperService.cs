@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,45 +11,45 @@ using TaskManagmentApi.Services.Mappers;
 
 namespace TaskManagmentApi.Services.Services
 {
-    public interface IManagerService
+    public interface IDeveloperService
     {
-        Manager AddManager(string userId);
-        IEnumerable<ManagerDTO> GetAllManagers();
+        public Developer AddDeveloper(string userId);
+        IEnumerable<Developer> GetAllDevelopers();
     }
-    public class ManagerService : IManagerService
+    public class DeveloperService : IDeveloperService
     {
         private readonly TaskDBContext _taskDBContext;
-        public ManagerService(TaskDBContext taskDBContext)
+        public DeveloperService(TaskDBContext taskDBContext)
         {
             _taskDBContext = taskDBContext;
         }
 
-        public IEnumerable<ManagerDTO> GetAllManagers()
+        public IEnumerable<Developer> GetAllDevelopers()
         {
-            var allManagers = _taskDBContext.Managers.Include(c => c.User).ToList();
-            return allManagers.Select(c => new ManagerMapper().Map(c)).ToList();
+            return _taskDBContext.Developers.Include(c => c.User).ToList();
+            //return allManagers.Select(c => new ManagerMapper().Map(c)).ToList();
         }
 
-        public Manager AddManager(string userId)
+
+        public Developer AddDeveloper(string userId)
         {
             try
             {
-                var newManager = new Manager
+                var newDeveloper = new Developer
                 {
                     Id = userId,
-                    Bio = "",
-                    IsActive = 1
+                    Bio = ""
                 };
-                _taskDBContext.Managers.Add(newManager);
+                _taskDBContext.Developers.Add(newDeveloper);
                 _taskDBContext.SaveChanges();
 
-                return newManager;
+                return newDeveloper;
             }
             catch (Exception e)
             {
                 return null;
             }
-
         }
+
     }
 }
