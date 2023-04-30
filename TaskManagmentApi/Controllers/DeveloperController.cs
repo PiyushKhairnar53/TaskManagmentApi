@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagmentApi.Models;
 using TaskManagmentApi.Services.DTOs;
 using TaskManagmentApi.Services.Services;
 
@@ -59,6 +60,21 @@ namespace TaskManagmentApi.Controllers
                 }
             }
             return BadRequest("Enter valid details");
+        }
+
+        [HttpGet("GetTasksByDeveloper/{id}")]
+        public async Task<IActionResult> GetTasksByDeveloper(string id)
+        {
+            Response response;
+            IEnumerable<TaskManagerDTO> tasks = _developerService.GetTasksForDeveloper(id);
+
+            if (tasks.Any())
+            {
+                response = new Response(StatusCodes.Status200OK, "Tasks retreived successfully", tasks.ToList());
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status404NotFound, "Tasks Not Found", null);
+            return BadRequest(response);
         }
     }
 }

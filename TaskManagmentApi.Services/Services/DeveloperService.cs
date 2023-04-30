@@ -16,7 +16,8 @@ namespace TaskManagmentApi.Services.Services
         public Developer AddDeveloper(string userId);
         IEnumerable<DeveloperDTO> GetAllDevelopers();
         DeveloperDTO GetDeveloperById(string userId);
-        DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper)
+        DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper);
+        IEnumerable<TaskManagerDTO> GetTasksForDeveloper(string developerId);
     }
     public class DeveloperService : IDeveloperService
     {
@@ -103,6 +104,20 @@ namespace TaskManagmentApi.Services.Services
                 return mappedDeveloper;
             }
             return null;
+        }
+
+        public IEnumerable<TaskManagerDTO> GetTasksForDeveloper(string developerId)
+        {
+
+            var mattersByClient = _taskDBContext.Tasks
+                    .Include(m => m.Manager)
+                    .Include(m => m.Developer)
+                    .Include(m => m.Manager.User)
+                    .Include(m => m.Developer.User)
+                    .Include(m => m.Status)
+                    .Where(c => c.DeveloperId.Equals(developerId));
+            return mattersByClient.Select(c => new TaskManagerMapper().Map(c)).ToList();
+
         }
     }
 }

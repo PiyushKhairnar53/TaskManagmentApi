@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using TaskManagmentApi.Data.Models;
+using TaskManagmentApi.Models;
+using TaskManagmentApi.Services.DTOs;
+using TaskManagmentApi.Services.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +13,82 @@ namespace TaskManagmentApi.Controllers
     [ApiController]
     public class TaskController : ControllerBase
     {
-        // GET: api/<TaskController>
+        private readonly ITaskService _taskService;
+
+        public TaskController(ITaskService taskService)
+        {
+            _taskService = taskService;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        [Route("GetAllTasks")]
+        public IEnumerable<TaskTable> GetAllTasks()
         {
-            return new string[] { "value1", "value2" };
+            IEnumerable<TaskTable> developers = _taskService.GetAllTask();
+            return developers;
         }
 
-        // GET api/<TaskController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<TaskController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Route("AddTask")]
+        public async Task<IActionResult> AddTask([FromBody] TaskDTO task)
         {
+            Response response;
+            TaskTable newTask = _taskService.AddTask(task);
+            if (newTask != null) 
+            {
+                response = new Response(StatusCodes.Status200OK, "Task added successfully", newTask);
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status500InternalServerError,"Task not added!", newTask);
+            return BadRequest(response);
         }
 
-        // PUT api/<TaskController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTasksByManager(string id)
         {
+            Response response;
+            IEnumerable<TaskManagerDTO> tasks = _taskService.GetTasksByManager(id);
+
+            if (tasks.Any())
+            {
+                response = new Response(StatusCodes.Status200OK, "Task Retrieved successfully", tasks.ToList());
+                return Ok(response);  
+            }
+            response = new Response(StatusCodes.Status404NotFound, "Task Not Found",null);
+            return BadRequest(response);
         }
 
-        // DELETE api/<TaskController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPut]
+        [Route("UpdateTaskStatus")]
+        public async Task<IActionResult> UpdateTaskStatus([FromBody] TaskStatusUpdateDTO task)
         {
+            Response response;
+            TaskTable updatedTask = _taskService.UpdateTaskStatus(task);
+
+            if (updatedTask!=null)
+            {
+                response = new Response(StatusCodes.Status200OK, "Task Status Updated successfully", updatedTask);
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status500InternalServerError, "Task Status Not Updated!", null);
+            return BadRequest(response);
         }
+
+        [HttpPut]
+        [Route("UpdateTaskDeveloper")]
+        public async Task<IActionResult> UpdateTaskDeveloper([FromBody] TaskDeveloperUpdateDTO task)
+        {
+            Response response;
+            TaskTable updatedDeveloper = _taskService.UpdateDeveloperOnTask(task);
+
+            if (updatedDeveloper != null)
+            {
+                response = new Response(StatusCodes.Status200OK, "Task Developer Updated successfully", updatedDeveloper);
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status500InternalServerError, "Task Developer Not Updated!", null);
+            return BadRequest(response);
+        }
+
     }
 }

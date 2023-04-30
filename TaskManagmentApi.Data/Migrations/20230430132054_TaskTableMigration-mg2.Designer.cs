@@ -12,8 +12,8 @@ using TaskManagmentApi.Data.DBContext;
 namespace TaskManagmentApi.Data.Migrations
 {
     [DbContext(typeof(TaskDBContext))]
-    [Migration("20230429200955_TaskManagerMigration-mg3")]
-    partial class TaskManagerMigrationmg3
+    [Migration("20230430132054_TaskTableMigration-mg2")]
+    partial class TaskTableMigrationmg2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,36 @@ namespace TaskManagmentApi.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CommentName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Developer", b =>
                 {
                     b.Property<string>("Id")
@@ -224,8 +254,9 @@ namespace TaskManagmentApi.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
+                    b.Property<string>("CreatedByManagerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -236,6 +267,9 @@ namespace TaskManagmentApi.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("EstimatedTime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IsActive")
                         .HasColumnType("int");
 
                     b.Property<string>("ManagerId")
@@ -256,11 +290,10 @@ namespace TaskManagmentApi.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UpdatedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id")
                         .HasName("TaskId");
+
+                    b.HasIndex("CreatedByManagerId");
 
                     b.HasIndex("DeveloperId");
 
@@ -405,6 +438,21 @@ namespace TaskManagmentApi.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.Comment", b =>
+                {
+                    b.HasOne("TaskManagmentApi.Data.Models.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
+
+                    b.HasOne("TaskManagmentApi.Data.Models.TaskTable", "Task")
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskId");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Task");
+                });
+
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Developer", b =>
                 {
                     b.HasOne("TaskManagmentApi.Data.Models.User", "User")
@@ -429,6 +477,12 @@ namespace TaskManagmentApi.Data.Migrations
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.TaskTable", b =>
                 {
+                    b.HasOne("TaskManagmentApi.Data.Models.Manager", "CreatedByManager")
+                        .WithMany()
+                        .HasForeignKey("CreatedByManagerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TaskManagmentApi.Data.Models.Developer", "Developer")
                         .WithMany("Tasks")
                         .HasForeignKey("DeveloperId");
@@ -440,6 +494,8 @@ namespace TaskManagmentApi.Data.Migrations
                     b.HasOne("TaskManagmentApi.Data.Models.Status", "Status")
                         .WithMany("Tasks")
                         .HasForeignKey("StatusId");
+
+                    b.Navigation("CreatedByManager");
 
                     b.Navigation("Developer");
 
@@ -461,6 +517,11 @@ namespace TaskManagmentApi.Data.Migrations
             modelBuilder.Entity("TaskManagmentApi.Data.Models.Status", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TaskManagmentApi.Data.Models.TaskTable", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("TaskManagmentApi.Data.Models.User", b =>

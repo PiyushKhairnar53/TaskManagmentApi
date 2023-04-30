@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 
@@ -32,14 +33,15 @@ namespace TaskManagmentApi.Data.Models
         public int EstimatedTime { get; set; }
         public int ActualTime { get; set; }
 
-        [Required]
         public DateTime CreatedAt { get; set; }
-        [Required]
-        public int CreatedBy { get; set; }
+        public string CreatedByManagerId { get; set; }
+        public Manager CreatedByManager { get; set; }
 
         public DateTime UpdatedAt { get; set; }
-        public int UpdatedBy { get; set; }
 
+        public ICollection<Comment> Comments { get; set; }
+
+        public int IsActive { get; set; }
 
     }
 }

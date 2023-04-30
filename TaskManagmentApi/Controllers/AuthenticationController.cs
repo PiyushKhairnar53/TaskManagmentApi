@@ -76,9 +76,13 @@ namespace TaskManagmentApi.Controllers
         [Route("RegisterManager")]
         public async Task<IActionResult> RegisterManager([FromBody] RegisterDTO registerDto)
         {
+            Response response;
             var userExists = await _userManager.FindByNameAsync(registerDto.Username);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "User Already Exists", null);
+                return BadRequest(response);
+            }
 
             if (!string.IsNullOrEmpty(registerDto.FirstName) && !string.IsNullOrEmpty(registerDto.LastName) && !string.IsNullOrEmpty(registerDto.Email))
             {
@@ -97,7 +101,8 @@ namespace TaskManagmentApi.Controllers
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
                 if (!result.Succeeded)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+                    response = new Response(StatusCodes.Status500InternalServerError, "Failed to register Manager", null);
+                    return BadRequest(response);
                 }
                 else
                 {
@@ -112,11 +117,12 @@ namespace TaskManagmentApi.Controllers
                     }
 
                     Manager newManager = _managerService.AddManager(user.Id);
-
-                    return Ok(new Response { Status = "Success", Message = "User created successfully! "});
+                    response = new Response(StatusCodes.Status200OK, "Manager registerd successfully", newManager);
+                    return Ok(response);
                 }
             }
-            return BadRequest(new Response { Status = "Failed", Message = "Please enter valid details!" });
+            response = new Response(StatusCodes.Status200OK, "Please enter valid details!", null);
+            return BadRequest(response);
         }
 
 
@@ -124,9 +130,12 @@ namespace TaskManagmentApi.Controllers
         [Route("RegisterDeveloper")]
         public async Task<IActionResult> RegisterDeveloper([FromBody] RegisterDTO registerDto)
         {
+            Response response;
             var userExists = await _userManager.FindByNameAsync(registerDto.Username);
-            if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+            if (userExists != null) {
+                response = new Response(StatusCodes.Status500InternalServerError, "User Already Exists", null);
+                return BadRequest(response);
+            }
 
             if (!string.IsNullOrEmpty(registerDto.FirstName) && !string.IsNullOrEmpty(registerDto.LastName) && !string.IsNullOrEmpty(registerDto.Email))
             {
@@ -145,7 +154,8 @@ namespace TaskManagmentApi.Controllers
                 var result = await _userManager.CreateAsync(user, registerDto.Password);
                 if (!result.Succeeded)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+                    response = new Response(StatusCodes.Status500InternalServerError, "Failed to register Developer", null);
+                    return BadRequest(response);
                 }
                 else
                 {
@@ -159,11 +169,12 @@ namespace TaskManagmentApi.Controllers
                         await _userManager.AddToRoleAsync(user, UserRoles.Developer);
                     }
                     Developer developer = _developerService.AddDeveloper(user.Id);
-
-                    return Ok(new Response { Status = "Success", Message = "User created successfully! - "+developer.Id });
+                    response = new Response(StatusCodes.Status200OK, "Developer registerd successfully", developer);
+                    return Ok(response);
                 }
             }
-            return BadRequest(new Response { Status = "Failed", Message = "Please enter valid details!" });
+            response = new Response(StatusCodes.Status200OK, "Please enter valid details!", null);
+            return BadRequest(response);
         }
 
         private JwtSecurityToken GetToken(List<Claim> authClaims)

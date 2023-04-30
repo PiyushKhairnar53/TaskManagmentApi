@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>

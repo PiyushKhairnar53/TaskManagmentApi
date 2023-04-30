@@ -7,19 +7,21 @@ using TaskManagmentApi.Data.Models;
 
 namespace TaskManagmentApi.Data.DBContext
 {
-    public class TaskDBContext:IdentityDbContext<User>
+    public class TaskDBContext : IdentityDbContext<User>
     {
-        public TaskDBContext(DbContextOptions options) : base(options){ }
+        public TaskDBContext(DbContextOptions options) : base(options) { }
 
         public DbSet<Status> Status { get; set; }
         public DbSet<TaskTable> Tasks { get; set; }
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Developer> Developers { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
 
             modelBuilder.Entity<Manager>()
             .HasKey(m => m.Id)
@@ -56,15 +58,16 @@ namespace TaskManagmentApi.Data.DBContext
                .HasForeignKey(e => e.StatusId)
                .IsRequired(false);
 
-            //modelBuilder.Entity<Manager>()
-            //  .HasOne(e => e.User)
-            //  .WithOne(e => e.Manager)
-            //  .HasForeignKey<Manager>(e=>e.Id);
+            modelBuilder.Entity<TaskTable>()
+               .HasMany(e => e.Comments)
+               .WithOne(e => e.Task)
+               .HasForeignKey(e => e.TaskId)
+               .IsRequired(false);
 
             modelBuilder.Entity<User>()
-                .HasOne<Manager>(s => s.Manager)
-                .WithOne(c => c.User)
-                .HasForeignKey<Manager>(ad => ad.Id);
+               .HasOne<Manager>(s => s.Manager)
+               .WithOne(c => c.User)
+               .HasForeignKey<Manager>(ad => ad.Id);
 
         }
     }

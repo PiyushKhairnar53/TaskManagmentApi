@@ -24,6 +24,5 @@ namespace TaskManagmentApi.Data.Models
 
         public Manager Manager { get; set; }
         //public Developer Developer { get; set; }
-
     }
 }
