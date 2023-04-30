@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagmentApi.Data.Models;
 using TaskManagmentApi.Services.DTOs;
 using TaskManagmentApi.Services.Services;
 
@@ -35,6 +36,24 @@ namespace TaskManagmentApi.Controllers
                 if (manager != null)
                 {
                     return Ok(manager);
+                }
+                else
+                {
+                    return NotFound("Manager not found");
+                }
+            }
+            return BadRequest("Enter valid details");
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateManager(string id, ManagerUpdateDTO newManager)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                var manager = _managerService.UpdateManager(id,newManager);
+                if (manager != null)
+                {
+                    return Ok("Manager updated successfully");
                 }
                 else
                 {

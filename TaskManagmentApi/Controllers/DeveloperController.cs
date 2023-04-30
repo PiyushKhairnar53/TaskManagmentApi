@@ -42,5 +42,23 @@ namespace TaskManagmentApi.Controllers
             }
             return BadRequest("Enter valid details");
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateDeveloper(string id, DeveloperUpdateDTO newDeveloper)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                var developer = _developerService.UpdateDeveloper(id, newDeveloper);
+                if (developer != null)
+                {
+                    return Ok("Developer updated successfully" + developer);
+                }
+                else
+                {
+                    return NotFound("Developer not found");
+                }
+            }
+            return BadRequest("Enter valid details");
+        }
     }
 }

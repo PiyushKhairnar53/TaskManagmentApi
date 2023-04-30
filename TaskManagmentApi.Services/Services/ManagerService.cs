@@ -17,6 +17,8 @@ namespace TaskManagmentApi.Services.Services
         Manager AddManager(string userId);
         IEnumerable<ManagerDTO> GetAllManagers();
         ManagerDTO GetManagerById(string userId);
+        Manager UpdateManager(string id, ManagerUpdateDTO newManager);
+
     }
     public class ManagerService : IManagerService
     {
@@ -58,8 +60,41 @@ namespace TaskManagmentApi.Services.Services
             var manager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
             if (manager != null)
             {
-                var mappedDeveloper = new ManagerMapper().Map(manager);
-                return mappedDeveloper;
+                var mappedManager = new ManagerMapper().Map(manager);
+                return mappedManager;
+            }
+            return null;
+        }
+
+        public Manager UpdateManager(string userId, ManagerUpdateDTO newManager)
+        {
+            var findManager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            if (findManager != null)
+            {
+                if (string.IsNullOrEmpty(newManager.Bio)){
+                    newManager.Bio = findManager.Bio;
+                }
+                if (string.IsNullOrEmpty(newManager.FirstName)) {
+                    newManager.FirstName = findManager.User.FirstName;
+                }
+                if (string.IsNullOrEmpty(newManager.LastName)) {
+                    newManager.LastName = findManager.User.LastName;
+                }
+                if (string.IsNullOrEmpty(newManager.Email)) {
+                    newManager.Email = findManager.User.Email;
+                }
+                if (string.IsNullOrEmpty(newManager.PhoneNumber)) {
+                    newManager.PhoneNumber = findManager.User.PhoneNumber;
+                }
+
+                findManager.Bio = newManager.Bio;
+                findManager.User.FirstName = newManager.FirstName;
+                findManager.User.LastName = newManager.LastName;
+                findManager.User.Email = newManager.Email;
+                findManager.User.PhoneNumber = newManager.PhoneNumber;
+                findManager.User.UpdatedAt = DateTime.Now;
+                _taskDBContext.SaveChanges();
+                return findManager;
             }
             return null;
         }

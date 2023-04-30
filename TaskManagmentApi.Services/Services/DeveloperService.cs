@@ -16,6 +16,7 @@ namespace TaskManagmentApi.Services.Services
         public Developer AddDeveloper(string userId);
         IEnumerable<DeveloperDTO> GetAllDevelopers();
         DeveloperDTO GetDeveloperById(string userId);
+        DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper)
     }
     public class DeveloperService : IDeveloperService
     {
@@ -38,7 +39,8 @@ namespace TaskManagmentApi.Services.Services
                 var newDeveloper = new Developer
                 {
                     Id = userId,
-                    Bio = ""
+                    Bio = "",
+                    IsActive = 1
                 };
                 _taskDBContext.Developers.Add(newDeveloper);
                 _taskDBContext.SaveChanges();
@@ -57,6 +59,47 @@ namespace TaskManagmentApi.Services.Services
             if (developer != null)
             {
                 var mappedDeveloper = new DeveloperMapper().Map(developer);
+                return mappedDeveloper;
+            }
+            return null;
+        }
+
+        public DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper)
+        {
+            var findDeveloper = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            if (findDeveloper != null)
+            {
+                if (string.IsNullOrEmpty(newDeveloper.Bio))
+                {
+                    newDeveloper.Bio = findDeveloper.Bio;
+                }
+                if (string.IsNullOrEmpty(newDeveloper.FirstName))
+                {
+                    newDeveloper.FirstName = findDeveloper.User.FirstName;
+                }
+                if (string.IsNullOrEmpty(newDeveloper.LastName))
+                {
+                    newDeveloper.LastName = findDeveloper.User.LastName;
+                }
+                if (string.IsNullOrEmpty(newDeveloper.Email))
+                {
+                    newDeveloper.Email = findDeveloper.User.Email;
+                }
+                if (string.IsNullOrEmpty(newDeveloper.PhoneNumber))
+                {
+                    newDeveloper.PhoneNumber = findDeveloper.User.PhoneNumber;
+                }
+
+                findDeveloper.Bio = newDeveloper.Bio;
+                findDeveloper.User.FirstName = newDeveloper.FirstName;
+                findDeveloper.User.LastName = newDeveloper.LastName;
+                findDeveloper.User.Email = newDeveloper.Email;
+                findDeveloper.User.PhoneNumber = newDeveloper.PhoneNumber;
+                findDeveloper.User.UpdatedAt = DateTime.Now;
+                _taskDBContext.SaveChanges();
+
+                var mappedDeveloper = new DeveloperMapper().Map(findDeveloper);
+
                 return mappedDeveloper;
             }
             return null;
