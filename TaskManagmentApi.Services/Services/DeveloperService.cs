@@ -14,7 +14,8 @@ namespace TaskManagmentApi.Services.Services
     public interface IDeveloperService
     {
         public Developer AddDeveloper(string userId);
-        IEnumerable<Developer> GetAllDevelopers();
+        IEnumerable<DeveloperDTO> GetAllDevelopers();
+        DeveloperDTO GetDeveloperById(string userId);
     }
     public class DeveloperService : IDeveloperService
     {
@@ -24,12 +25,11 @@ namespace TaskManagmentApi.Services.Services
             _taskDBContext = taskDBContext;
         }
 
-        public IEnumerable<Developer> GetAllDevelopers()
+        public IEnumerable<DeveloperDTO> GetAllDevelopers()
         {
-            return _taskDBContext.Developers.Include(c => c.User).ToList();
-            //return allManagers.Select(c => new ManagerMapper().Map(c)).ToList();
+            var allDevelopers = _taskDBContext.Developers.Include(c => c.User).ToList();
+            return allDevelopers.Select(c => new DeveloperMapper().Map(c)).ToList();
         }
-
 
         public Developer AddDeveloper(string userId)
         {
@@ -51,5 +51,15 @@ namespace TaskManagmentApi.Services.Services
             }
         }
 
+        public DeveloperDTO GetDeveloperById(string userId)
+        {
+            var developer = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            if (developer != null)
+            {
+                var mappedDeveloper = new DeveloperMapper().Map(developer);
+                return mappedDeveloper;
+            }
+            return null;
+        }
     }
 }

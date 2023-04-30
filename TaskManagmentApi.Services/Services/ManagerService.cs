@@ -16,6 +16,7 @@ namespace TaskManagmentApi.Services.Services
     {
         Manager AddManager(string userId);
         IEnumerable<ManagerDTO> GetAllManagers();
+        ManagerDTO GetManagerById(string userId);
     }
     public class ManagerService : IManagerService
     {
@@ -50,7 +51,17 @@ namespace TaskManagmentApi.Services.Services
             {
                 return null;
             }
+        }
 
+        public ManagerDTO GetManagerById(string userId)
+        {
+            var manager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            if (manager != null)
+            {
+                var mappedDeveloper = new ManagerMapper().Map(manager);
+                return mappedDeveloper;
+            }
+            return null;
         }
     }
 }

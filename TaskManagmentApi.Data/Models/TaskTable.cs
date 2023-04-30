@@ -17,7 +17,6 @@ namespace TaskManagmentApi.Data.Models
         [Required]
         public string Priority { get; set; }
 
-
         [Required]
         public string ManagerId { get; set; }
         public Manager Manager { get; set; }

@@ -38,22 +38,6 @@ namespace TaskManagmentApi.Controllers
             _developerService = developerService;
         }
 
-        [HttpGet]
-        [Route("GetAllManagers")]
-        public IEnumerable<ManagerDTO> GetAllManagers()
-        {
-            IEnumerable<ManagerDTO> managers = _managerService.GetAllManagers();
-            return managers;
-        }
-
-        [HttpGet]
-        [Route("GetAllDevelopers")]
-        public IEnumerable<Developer> GetAllDevelopers()
-        {
-            IEnumerable<Developer> managers = _developerService.GetAllDevelopers();
-            return managers;
-        }
-
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO model)
