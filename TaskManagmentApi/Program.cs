@@ -26,6 +26,12 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<TaskDBContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddCors(o => o.AddPolicy("ReactPolicy", builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+}));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -57,6 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("ReactPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

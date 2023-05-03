@@ -7,17 +7,11 @@ using System.Threading.Tasks;
 
 namespace TaskManagmentApi.Data.Models
 {
-    public class Comment
+    public class Position
     {
         [Key]
         public int Id { get; set; }
-        public string CommentName { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-        public User CreatedByUser { get; set; }
-
-        public int TaskId { get; set; }
-        public TaskTable Task { get; set; }
-
+        public string PositionName { get; set; }
+        public ICollection<Developer> Developers { get; set; }
     }
 }

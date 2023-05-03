@@ -64,7 +64,7 @@ namespace TaskManagmentApi.Controllers
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo,
-                    role = userRoles,
+                    role = userRoles[0],
                     userId = user.Id
                 });
             }

@@ -16,6 +16,7 @@ namespace TaskManagmentApi.Data.DBContext
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Developer> Developers { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Position> Positions { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,6 +40,9 @@ namespace TaskManagmentApi.Data.DBContext
             .HasKey(t => t.Id)
             .HasName("TaskId");
 
+            modelBuilder.Entity<Comment>()
+            .HasKey(p => p.Id)
+            .HasName("CommentId");
 
             modelBuilder.Entity<Manager>()
                .HasMany(e => e.Tasks)
@@ -68,6 +72,13 @@ namespace TaskManagmentApi.Data.DBContext
                .HasOne<Manager>(s => s.Manager)
                .WithOne(c => c.User)
                .HasForeignKey<Manager>(ad => ad.Id);
+
+            modelBuilder.Entity<Position>()
+             .HasMany(e => e.Developers)
+             .WithOne(e => e.Position)
+             .HasForeignKey(e => e.PositionId)
+             .IsRequired(false);
+
 
         }
     }

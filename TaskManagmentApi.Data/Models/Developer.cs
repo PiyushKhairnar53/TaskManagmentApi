@@ -14,9 +14,11 @@ namespace TaskManagmentApi.Data.Models
         public string Id { get; set; }
         //public int ManagerPositionId { get; set; }
         public string? Bio { get; set; }
+        public string? Skills { get; set; }
         public User User { get; set; }
         public ICollection<TaskTable> Tasks { get; set; }
         public int IsActive { get; set; }
-
+        public int? PositionId { get; set; }
+        public Position Position { get; set; }
     }
 }
