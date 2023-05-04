@@ -56,13 +56,20 @@ namespace TaskManagmentApi.Services.Services
 
         public DeveloperDTO GetDeveloperById(string userId)
         {
-            var developer = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
-            if (developer != null)
+            try
             {
-                var mappedDeveloper = new DeveloperMapper().Map(developer);
-                return mappedDeveloper;
+                var developer = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+                if (developer != null)
+                {
+                    var mappedDeveloper = new DeveloperMapper().Map(developer);
+                    return mappedDeveloper;
+                }
+                return null;
             }
-            return null;
+            catch
+            {
+                return null;
+            }
         }
 
         public DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper)
@@ -108,16 +115,20 @@ namespace TaskManagmentApi.Services.Services
 
         public IEnumerable<TaskManagerDTO> GetTasksForDeveloper(string developerId)
         {
-
-            var mattersByClient = _taskDBContext.Tasks
-                    .Include(m => m.Manager)
-                    .Include(m => m.Developer)
-                    .Include(m => m.Manager.User)
-                    .Include(m => m.Developer.User)
-                    .Include(m => m.Status)
-                    .Where(c => c.DeveloperId.Equals(developerId));
-            return mattersByClient.Select(c => new TaskManagerMapper().Map(c)).ToList();
-
+            try
+            {
+                var mattersByClient = _taskDBContext.Tasks
+                        .Include(m => m.Manager)
+                        .Include(m => m.Developer)
+                        .Include(m => m.Manager.User)
+                        .Include(m => m.Developer.User)
+                        .Include(m => m.Status)
+                        .Where(c => c.DeveloperId.Equals(developerId));
+                return mattersByClient.Select(c => new TaskManagerMapper().Map(c)).ToList();
+            }
+            catch {
+                return null;
+            }
         }
     }
 }

@@ -19,7 +19,6 @@ namespace TaskManagmentApi.Services.Mappers
                 Bio = entity.Bio,
                 FirstName = entity.User.FirstName,
                 LastName = entity.User.LastName,
-                UserRole = entity.User.UserRole,
                 PhoneNumber = entity.User.PhoneNumber,
                 Email = entity.User.Email
             };

@@ -19,7 +19,9 @@ namespace TaskManagmentApi.Services.Services
         TaskTable UpdateTaskStatus(TaskStatusUpdateDTO task);
         TaskTable UpdateDeveloperOnTask(TaskDeveloperUpdateDTO task);
         TaskTable UpdateTask(TaskUpdateDTO task);
-        IEnumerable<TaskByStatusDTO> GetTasksByStatus(StatusManagerDTO statusManager);
+        IEnumerable<TaskByStatusDTO> GetTasksByStatus(StatusUserDTO statusManager);
+        IEnumerable<TaskByStatusDeveloperDTO> GetTasksByStatusDeveloper(StatusUserDTO statusUser);
+        TaskTable UpdateTaskDeveloper(TaskUpdateDeveloperDTO task);
     }
     public class TaskService : ITaskService
     {
@@ -80,18 +82,16 @@ namespace TaskManagmentApi.Services.Services
         {
 
             var mattersByClient = _taskDBContext.Tasks
-                    .Include(m => m.Manager)
-                    .Include(m => m.Developer)
                     .Include(m => m.Manager.User)
                     .Include(m => m.Developer.User)
                     .Include(m => m.Status)
                     .Where(c => c.ManagerId.Equals(managerId));
             return mattersByClient.Select(c => new TaskManagerMapper().Map(c)).ToList();
-
         }
 
         public TaskTable UpdateTaskStatus(TaskStatusUpdateDTO task)
         {
+            
             var findTask = _taskDBContext.Tasks.FirstOrDefault(d => d.Id.Equals(task.TaskId));
             if (findTask != null)
             {
@@ -130,12 +130,56 @@ namespace TaskManagmentApi.Services.Services
             return null;
         }
 
+        public TaskTable UpdateTaskDeveloper(TaskUpdateDeveloperDTO task)
+        {
+            try
+            {
+                var findTask = _taskDBContext.Tasks.FirstOrDefault(d => d.Id.Equals(task.TaskId));
+                if (findTask != null)
+                {
+                    if (findTask.DeveloperId.Equals(task.UserId))
+                    {
+                        if (string.IsNullOrEmpty(task.Title))
+                        {
+                            task.Title = findTask.Title;
+                        }
+                        if (string.IsNullOrEmpty(task.Description))
+                        {
+                            task.Description = findTask.Description;
+                        }
+                        if (string.IsNullOrEmpty(task.Priority))
+                        {
+                            task.Priority = findTask.Priority;
+                        }
+                        if (task.ActualTime <= 0)
+                        {
+                            task.ActualTime = findTask.ActualTime;
+                        }
+
+
+                        findTask.Title = task.Title;
+                        findTask.Description = task.Description;
+                        findTask.Priority = task.Priority;
+                        findTask.ActualTime = task.ActualTime;
+                        findTask.UpdatedAt = DateTime.Now;
+                        _taskDBContext.SaveChanges();
+                        return findTask;
+                    }
+                }
+                return null;
+            }
+            catch(Exception e) 
+            {
+                return null;
+            }
+        }
+
         public TaskTable UpdateTask(TaskUpdateDTO task)
         {
             var findTask = _taskDBContext.Tasks.FirstOrDefault(d => d.Id.Equals(task.TaskId));
             if (findTask != null)
             {
-                if (findTask.ManagerId.Equals(task.UserId) || findTask.DeveloperId.Equals(task.UserId))
+                if (findTask.ManagerId.Equals(task.UserId))
                 {
                     if (string.IsNullOrEmpty(task.Title))
                     {
@@ -149,19 +193,20 @@ namespace TaskManagmentApi.Services.Services
                     {
                         task.Priority = findTask.Priority;
                     }
-                    if (task.StatusId==0 || task.StatusId == null)
-                    {
-                        task.StatusId = findTask.StatusId;
-                    }
-                    if (task.ActualTime>=1 && task.ActualTime<=1000)
+                    if (task.ActualTime<=0)
                     {
                         task.ActualTime = findTask.ActualTime;
+                    }
+                    if (string.IsNullOrEmpty(task.DeveloperId))
+                    {
+                        task.DeveloperId = findTask.DeveloperId;
                     }
 
                     findTask.Title = task.Title;
                     findTask.Description = task.Description;
                     findTask.Priority = task.Priority;
-                    findTask.StatusId = task.StatusId;
+                    findTask.EstimatedTime = task.EstimatedTime;
+                    findTask.DeveloperId = task.DeveloperId;
                     findTask.ActualTime = task.ActualTime;
                     findTask.UpdatedAt = DateTime.Now;
                     _taskDBContext.SaveChanges();
@@ -173,15 +218,33 @@ namespace TaskManagmentApi.Services.Services
             return null;
         }
 
-        public IEnumerable<TaskByStatusDTO> GetTasksByStatus(StatusManagerDTO statusManager) 
+        public IEnumerable<TaskByStatusDTO> GetTasksByStatus(StatusUserDTO statusUser) 
         {
             var tasksByStatus = _taskDBContext.Tasks
                    .Include(m => m.Manager)
                    .Include(m => m.Developer)
                    .Include(m => m.Developer.User)
-                   .Where(c => c.ManagerId.Equals(statusManager.ManagerId) && c.StatusId.Equals(statusManager.StatusId));
+                   .Where(c => c.ManagerId.Equals(statusUser.UserId) && c.StatusId.Equals(statusUser.StatusId));
 
             return tasksByStatus.Select(c => new TasksByStatusMapper().Map(c)).ToList();
+        }
+
+        public IEnumerable<TaskByStatusDeveloperDTO> GetTasksByStatusDeveloper(StatusUserDTO statusUser)
+        {
+            try
+            {
+                var tasksByStatus = _taskDBContext.Tasks
+                       .Include(m => m.Developer)
+                       .Include(m => m.Manager)
+                       .Include(m => m.Manager.User)
+                       .Where(c => c.DeveloperId.Equals(statusUser.UserId) && c.StatusId.Equals(statusUser.StatusId));
+
+                return tasksByStatus.Select(c => new TaskByStatusDeveloperMapper().Map(c)).ToList();
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
     }
 }

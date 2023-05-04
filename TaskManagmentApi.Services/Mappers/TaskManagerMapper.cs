@@ -19,8 +19,6 @@ namespace TaskManagmentApi.Services.Mappers
                 Title = entity.Title,
                 Description = entity.Description,
                 Priority = entity.Priority,
-                ManagerFirstName = entity.Manager.User.FirstName,
-                ManagerLastName = entity.Manager.User.LastName,
                 DeveloperFirstName = entity.Developer.User.FirstName,
                 DeveloperLastName = entity.Developer.User.LastName,
                 StatusName = entity.Status.StatusName,

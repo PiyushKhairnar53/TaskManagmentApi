@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagmentApi.Services.DTOs
 {
-    public class TaskByStatusDTO
+    public class TaskByStatusDeveloperDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -14,10 +14,10 @@ namespace TaskManagmentApi.Services.DTOs
         public string Priority { get; set; }
         public int EstimatedTime { get; set; }
         public string ManagerId { get; set; }
-        public string DeveloperId { get; set; }
         public int ActualTime { get; set; }
-        public string DeveloperFirstName { get; set; }
-        public string DeveloperLastName { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string ManagerFirstName { get; set; }
+        public string ManagerLastName { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
     }
 }

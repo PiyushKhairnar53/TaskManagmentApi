@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TaskManagmentApi.Services.DTOs
 {
-    public class StatusManagerDTO
+    public class StatusUserDTO
     {
-        public string ManagerId { get; set; }
+        public string UserId { get; set; }
         public int StatusId { get; set; }
     }
 }

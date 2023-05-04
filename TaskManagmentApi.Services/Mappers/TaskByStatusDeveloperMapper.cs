@@ -8,22 +8,21 @@ using TaskManagmentApi.Services.DTOs;
 
 namespace TaskManagmentApi.Services.Mappers
 {
-    public class TasksByStatusMapper
+    public class TaskByStatusDeveloperMapper
     {
-        public TaskByStatusDTO Map(TaskTable entity)
+        public TaskByStatusDeveloperDTO Map(TaskTable entity)
         {
-            return new TaskByStatusDTO
+            return new TaskByStatusDeveloperDTO
             {
                 Id = entity.Id,
                 Title = entity.Title,
                 Description = entity.Description,
                 Priority = entity.Priority,
-                DeveloperFirstName = entity.Developer.User.FirstName,
-                DeveloperLastName = entity.Developer.User.LastName,
+                ManagerFirstName = entity.Manager.User.FirstName,
+                ManagerLastName = entity.Manager.User.LastName,
                 EstimatedTime = entity.EstimatedTime,
                 ManagerId = entity.ManagerId,
-                CreatedAt = entity.CreatedAt,
-                DeveloperId = entity.DeveloperId,
+                UpdatedAt = entity.UpdatedAt,
                 ActualTime = entity.ActualTime
             };
         }

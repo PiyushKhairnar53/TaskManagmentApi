@@ -22,10 +22,17 @@ namespace TaskManagmentApi.Controllers
 
         [HttpGet]
         [Route("GetAllTasks")]
-        public IEnumerable<TaskTable> GetAllTasks()
+        public async Task<IActionResult> GetAllTasks()
         {
+            Response response;
             IEnumerable<TaskTable> developers = _taskService.GetAllTask();
-            return developers;
+            if (developers != null)
+            {
+                response = new Response(StatusCodes.Status200OK, "Tasks Retreived successfully", developers);
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status404NotFound, "Task not Found!", null);
+            return BadRequest(response);
         }
 
         [HttpPost]
@@ -39,7 +46,7 @@ namespace TaskManagmentApi.Controllers
                 response = new Response(StatusCodes.Status200OK, "Task added successfully", newTask);
                 return Ok(response);
             }
-            response = new Response(StatusCodes.Status500InternalServerError,"Task not added!", newTask);
+            response = new Response(StatusCodes.Status500InternalServerError,"Task not added!", null);
             return BadRequest(response);
         }
 
@@ -74,21 +81,21 @@ namespace TaskManagmentApi.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut]
-        [Route("UpdateTaskDeveloper")]
-        public async Task<IActionResult> UpdateTaskDeveloper([FromBody] TaskDeveloperUpdateDTO task)
-        {
-            Response response;
-            TaskTable updatedDeveloper = _taskService.UpdateDeveloperOnTask(task);
+        //[HttpPut]
+        //[Route("UpdateTaskDeveloper")]
+        //public async Task<IActionResult> UpdateTaskDeveloper([FromBody] TaskDeveloperUpdateDTO task)
+        //{
+        //    Response response;
+        //    TaskTable updatedDeveloper = _taskService.UpdateDeveloperOnTask(task);
 
-            if (updatedDeveloper != null)
-            {
-                response = new Response(StatusCodes.Status200OK, "Task Developer Updated successfully", updatedDeveloper);
-                return Ok(response);
-            }
-            response = new Response(StatusCodes.Status500InternalServerError, "Task Developer Not Updated!", null);
-            return BadRequest(response);
-        }
+        //    if (updatedDeveloper != null)
+        //    {
+        //        response = new Response(StatusCodes.Status200OK, "Task Developer Updated successfully", updatedDeveloper);
+        //        return Ok(response);
+        //    }
+        //    response = new Response(StatusCodes.Status500InternalServerError, "Task Developer Not Updated!", null);
+        //    return BadRequest(response);
+        //}
 
         [HttpPut]
         [Route("UpdateTask")]
@@ -99,15 +106,31 @@ namespace TaskManagmentApi.Controllers
 
             if (updatedTask != null)
             {
-                response = new Response(StatusCodes.Status200OK, "Task Developer Updated successfully", updatedTask);
+                response = new Response(StatusCodes.Status200OK, "Task Updated successfully", updatedTask);
                 return Ok(response);
             }
-            response = new Response(StatusCodes.Status500InternalServerError, "Task Developer Not Updated!", null);
+            response = new Response(StatusCodes.Status500InternalServerError, "Task Not Updated!", null);
+            return BadRequest(response);
+        }
+
+        [HttpPut]
+        [Route("UpdateTaskDeveloper")]
+        public async Task<IActionResult> UpdateTaskDeveloper([FromBody] TaskUpdateDeveloperDTO task)
+        {
+            Response response;
+            TaskTable updatedTask = _taskService.UpdateTaskDeveloper(task);
+
+            if (updatedTask != null)
+            {
+                response = new Response(StatusCodes.Status200OK, "Task Updated successfully", updatedTask);
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status500InternalServerError, "Task Not Updated!", null);
             return BadRequest(response);
         }
 
         [HttpPost("GetTasksByStatus")]
-        public async Task<IActionResult> GetTasksByStatus(StatusManagerDTO statusManager)
+        public async Task<IActionResult> GetTasksByStatus(StatusUserDTO statusManager)
         {
             Response response;
             IEnumerable<TaskByStatusDTO> tasks = _taskService.GetTasksByStatus(statusManager);
@@ -121,6 +144,21 @@ namespace TaskManagmentApi.Controllers
             return BadRequest(response);
         }
 
+
+        [HttpPost("GetTasksByStatusDeveloper")]
+        public async Task<IActionResult> GetTasksByStatusDeveloper(StatusUserDTO statusUser)
+        {
+            Response response;
+            IEnumerable<TaskByStatusDeveloperDTO> tasks = _taskService.GetTasksByStatusDeveloper(statusUser);
+
+            if (tasks.Any())
+            {
+                response = new Response(StatusCodes.Status200OK, "Tasks retreived successfully", tasks.ToList());
+                return Ok(response);
+            }
+            response = new Response(StatusCodes.Status404NotFound, "Tasks Not Found", null);
+            return BadRequest(response);
+        }
 
     }
 }
