@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TaskManagmentApi.Data.Models;
 using TaskManagmentApi.Models;
 using TaskManagmentApi.Services.DTOs;
 using TaskManagmentApi.Services.Services;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TaskManagmentApi.Controllers
 {
@@ -20,61 +20,106 @@ namespace TaskManagmentApi.Controllers
 
         [HttpGet]
         [Route("GetAllDevelopers")]
-        public IEnumerable<DeveloperDTO> GetAllDevelopers()
+        public IActionResult GetAllDevelopers()
         {
-            IEnumerable<DeveloperDTO> developers = _developerService.GetAllDevelopers();
-            return developers;
+            Response response;
+            try
+            {
+                IEnumerable<DeveloperDTO> developers = _developerService.GetAllDevelopers();
+                if (developers != null)
+                {
+                    response = new Response(StatusCodes.Status200OK, "Developers Retreived successfully", developers);
+                    return Ok(response);
+                }
+                response = new Response(StatusCodes.Status404NotFound, "Task not Found!", null);
+                return BadRequest(response);
+            }
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetDeveloperById(string id) 
+        public IActionResult GetDeveloperById(string id)
         {
-            if (!string.IsNullOrEmpty(id)) 
+            Response response;
+
+            try
             {
-                DeveloperDTO developer = _developerService.GetDeveloperById(id);
-                if (developer != null)
+                if (!string.IsNullOrEmpty(id))
                 {
-                    return Ok(developer);
+                    DeveloperDTO developer = _developerService.GetDeveloperById(id);
+                    if (developer != null)
+                    {
+                        response = new Response(StatusCodes.Status200OK, "Developer Retreived successfully", developer);
+                        return Ok(response);
+                    }
+                    response = new Response(StatusCodes.Status404NotFound, "Developer not Found!", null);
+                    return NotFound(response);
                 }
-                else
-                {
-                    return NotFound("Developer not found");
-                }
+                return BadRequest("Enter valid details");
             }
-            return BadRequest("Enter valid details");
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateDeveloper(string id, DeveloperUpdateDTO newDeveloper)
         {
-            if (!string.IsNullOrEmpty(id))
+            Response response;
+
+            try
             {
-                var developer = _developerService.UpdateDeveloper(id, newDeveloper);
-                if (developer != null)
+                if (!string.IsNullOrEmpty(id))
                 {
-                    return Ok("Developer updated successfully" + developer);
+                    DeveloperDTO developer = _developerService.UpdateDeveloper(id, newDeveloper);
+                    if (developer != null)
+                    {
+                        return Ok("Developer updated successfully" + developer);
+                    }
+                    else
+                    {
+                        return NotFound("Developer not found");
+                    }
                 }
-                else
-                {
-                    return NotFound("Developer not found");
-                }
+                return BadRequest("Enter valid details");
             }
-            return BadRequest("Enter valid details");
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
         [HttpGet("GetTasksByDeveloper/{id}")]
-        public async Task<IActionResult> GetTasksByDeveloper(string id)
+        public IActionResult GetTasksByDeveloper(string id)
         {
             Response response;
-            IEnumerable<TaskManagerDTO> tasks = _developerService.GetTasksForDeveloper(id);
-
-            if (tasks.Any())
+            try
             {
-                response = new Response(StatusCodes.Status200OK, "Tasks retreived successfully", tasks.ToList());
-                return Ok(response);
+                if (!string.IsNullOrEmpty(id))
+                {
+                    IEnumerable<TaskManagerDTO> tasks = _developerService.GetTasksForDeveloper(id);
+
+                    if (tasks.Any())
+                    {
+                        response = new Response(StatusCodes.Status200OK, "Tasks retreived successfully", tasks.ToList());
+                        return Ok(response);
+                    }
+                }
+                response = new Response(StatusCodes.Status404NotFound, "Tasks Not Found", null);
+                return BadRequest(response);
             }
-            response = new Response(StatusCodes.Status404NotFound, "Tasks Not Found", null);
-            return BadRequest(response);
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
     }
 }

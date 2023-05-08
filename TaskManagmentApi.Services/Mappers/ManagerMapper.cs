@@ -17,10 +17,12 @@ namespace TaskManagmentApi.Services.Mappers
             {
                 Id = entity.Id,
                 Bio = entity.Bio,
+                Username = entity.User.UserName,
                 FirstName = entity.User.FirstName,
                 LastName = entity.User.LastName,
                 PhoneNumber = entity.User.PhoneNumber,
-                Email = entity.User.Email
+                Email = entity.User.Email,
+                Address = entity.User.Address
             };
         }
     }

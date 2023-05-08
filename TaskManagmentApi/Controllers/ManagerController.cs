@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using TaskManagmentApi.Data.Models;
+using TaskManagmentApi.Models;
 using TaskManagmentApi.Services.DTOs;
 using TaskManagmentApi.Services.Services;
 
@@ -12,6 +14,7 @@ namespace TaskManagmentApi.Controllers
     [ApiController]
     public class ManagerController : ControllerBase
     {
+
         private readonly IManagerService _managerService;
 
         public ManagerController(IManagerService managerService)
@@ -21,46 +24,86 @@ namespace TaskManagmentApi.Controllers
 
         [HttpGet]
         [Route("GetAllManagers")]
-        public IEnumerable<ManagerDTO> GetAllManagers()
+        public IActionResult GetAllManagers()
         {
-            IEnumerable<ManagerDTO> managers = _managerService.GetAllManagers();
-            return managers;
+            Response response;
+            try
+            {
+                IEnumerable<ManagerDTO> managers = _managerService.GetAllManagers();
+                if (managers.Any())
+                {
+                    response = new Response(StatusCodes.Status200OK, "Managers retreived successfully", managers.ToList());
+                    return Ok(response);
+                }
+                if (!managers.Any())
+                {
+                    response = new Response(StatusCodes.Status404NotFound, "Managers not found", null);
+                    return Ok(response);
+                }
+                response = new Response(StatusCodes.Status400BadRequest, "Something went wrong", null);
+                return BadRequest(response);
+            }
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetManagerById(string id)
         {
-            if (!string.IsNullOrEmpty(id))
+            Response response;
+            try
             {
-                ManagerDTO manager = _managerService.GetManagerById(id);
-                if (manager != null)
+                if (!string.IsNullOrEmpty(id))
                 {
-                    return Ok(manager);
+                    ManagerDTO manager = _managerService.GetManagerById(id);
+                    if (manager != null)
+                    {
+                        response = new Response(StatusCodes.Status200OK, "Developer Retreived successfully", manager);
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response = new Response(StatusCodes.Status404NotFound, "Developer not Found!", null);
+                        return NotFound("Manager not found");
+                    }
                 }
-                else
-                {
-                    return NotFound("Manager not found");
-                }
+                return BadRequest("Enter valid details");
             }
-            return BadRequest("Enter valid details");
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateManager(string id, ManagerUpdateDTO newManager)
         {
-            if (!string.IsNullOrEmpty(id))
+            Response response;
+            try
             {
-                var manager = _managerService.UpdateManager(id,newManager);
-                if (manager != null)
+                if (!string.IsNullOrEmpty(id))
                 {
-                    return Ok("Manager updated successfully");
+                    Manager manager = _managerService.UpdateManager(id, newManager);
+                    if (manager != null)
+                    {
+                        return Ok("Manager updated successfully");
+                    }
+                    else
+                    {
+                        return NotFound("Manager not found");
+                    }
                 }
-                else
-                {
-                    return NotFound("Manager not found");
-                }
+                return BadRequest("Enter valid details");
             }
-            return BadRequest("Enter valid details");
+            catch (Exception e)
+            {
+                response = new Response(StatusCodes.Status500InternalServerError, "Something went wrong - " + e.Message, null);
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
     }
 }

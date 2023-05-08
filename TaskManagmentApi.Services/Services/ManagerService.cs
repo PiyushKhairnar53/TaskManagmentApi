@@ -30,15 +30,15 @@ namespace TaskManagmentApi.Services.Services
 
         public IEnumerable<ManagerDTO> GetAllManagers()
         {
-            var allManagers = _taskDBContext.Managers.Include(c => c.User).ToList();
+            List<Manager> allManagers = _taskDBContext.Managers.Include(c => c.User).ToList();
             return allManagers.Select(c => new ManagerMapper().Map(c)).ToList();
         }
 
         public Manager AddManager(string userId)
         {
-            try
+            if (!string.IsNullOrEmpty(userId))
             {
-                var newManager = new Manager
+                Manager newManager = new Manager
                 {
                     Id = userId,
                     Bio = "",
@@ -49,26 +49,26 @@ namespace TaskManagmentApi.Services.Services
 
                 return newManager;
             }
-            catch (Exception e)
-            {
-                return null;
-            }
+            return null;
         }
 
         public ManagerDTO GetManagerById(string userId)
         {
-            var manager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
-            if (manager != null)
+            if (!string.IsNullOrEmpty(userId))
             {
-                var mappedManager = new ManagerMapper().Map(manager);
-                return mappedManager;
+                Manager manager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+                if (manager != null)
+                {
+                    var mappedManager = new ManagerMapper().Map(manager);
+                    return mappedManager;
+                }
             }
             return null;
         }
 
         public Manager UpdateManager(string userId, ManagerUpdateDTO newManager)
         {
-            var findManager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            Manager findManager = _taskDBContext.Managers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
             if (findManager != null)
             {
                 if (string.IsNullOrEmpty(newManager.Bio)){

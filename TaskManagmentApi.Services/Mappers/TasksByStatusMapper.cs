@@ -20,9 +20,10 @@ namespace TaskManagmentApi.Services.Mappers
                 Priority = entity.Priority,
                 DeveloperFirstName = entity.Developer.User.FirstName,
                 DeveloperLastName = entity.Developer.User.LastName,
+                UserRole = entity.Manager.User.UserRole,
                 EstimatedTime = entity.EstimatedTime,
                 ManagerId = entity.ManagerId,
-                CreatedAt = entity.CreatedAt,
+                CreatedAt = entity.UpdatedAt,
                 DeveloperId = entity.DeveloperId,
                 ActualTime = entity.ActualTime
             };

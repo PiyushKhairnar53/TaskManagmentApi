@@ -19,6 +19,7 @@ namespace TaskManagmentApi.Services.Mappers
                 FirstName = entity.User.FirstName,
                 LastName = entity.User.LastName,
                 Skills = entity.Skills,
+                Address = entity.User.Address,
                 Username = entity.User.UserName,
                 PhoneNumber = entity.User.PhoneNumber,
                 Email = entity.User.Email

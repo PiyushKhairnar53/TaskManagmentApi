@@ -14,6 +14,7 @@ namespace TaskManagmentApi.Services.DTOs
         public string Priority { get; set; }
         public int EstimatedTime { get; set; }
         public string ManagerId { get; set; }
+        public string UserRole { get; set; }
         public string DeveloperId { get; set; }
         public int ActualTime { get; set; }
         public string DeveloperFirstName { get; set; }

@@ -29,15 +29,15 @@ namespace TaskManagmentApi.Services.Services
 
         public IEnumerable<DeveloperDTO> GetAllDevelopers()
         {
-            var allDevelopers = _taskDBContext.Developers.Include(c => c.User).ToList();
+            List<Developer> allDevelopers = _taskDBContext.Developers.Include(c => c.User).ToList();
             return allDevelopers.Select(c => new DeveloperMapper().Map(c)).ToList();
         }
 
         public Developer AddDeveloper(string userId)
         {
-            try
+            if (!string.IsNullOrEmpty(userId))
             {
-                var newDeveloper = new Developer
+                Developer newDeveloper = new Developer
                 {
                     Id = userId,
                     Bio = "",
@@ -48,33 +48,23 @@ namespace TaskManagmentApi.Services.Services
 
                 return newDeveloper;
             }
-            catch (Exception e)
-            {
-                return null;
-            }
+            return null;
         }
 
         public DeveloperDTO GetDeveloperById(string userId)
         {
-            try
-            {
-                var developer = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+                Developer developer = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
                 if (developer != null)
                 {
                     var mappedDeveloper = new DeveloperMapper().Map(developer);
                     return mappedDeveloper;
                 }
-                return null;
-            }
-            catch
-            {
-                return null;
-            }
+                return null;  
         }
 
         public DeveloperDTO UpdateDeveloper(string userId, DeveloperUpdateDTO newDeveloper)
         {
-            var findDeveloper = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
+            Developer findDeveloper = _taskDBContext.Developers.Include(c => c.User).FirstOrDefault(d => d.Id.Equals(userId));
             if (findDeveloper != null)
             {
                 if (string.IsNullOrEmpty(newDeveloper.Bio))
@@ -103,6 +93,9 @@ namespace TaskManagmentApi.Services.Services
                 findDeveloper.User.LastName = newDeveloper.LastName;
                 findDeveloper.User.Email = newDeveloper.Email;
                 findDeveloper.User.PhoneNumber = newDeveloper.PhoneNumber;
+                findDeveloper.Skills = newDeveloper.Skills;
+                findDeveloper.User.Gender = newDeveloper.Gender;
+                findDeveloper.User.Address = newDeveloper.Address;
                 findDeveloper.User.UpdatedAt = DateTime.Now;
                 _taskDBContext.SaveChanges();
 
@@ -114,10 +107,7 @@ namespace TaskManagmentApi.Services.Services
         }
 
         public IEnumerable<TaskManagerDTO> GetTasksForDeveloper(string developerId)
-        {
-            try
-            {
-                var mattersByClient = _taskDBContext.Tasks
+        {                IEnumerable<TaskTable> mattersByClient = _taskDBContext.Tasks
                         .Include(m => m.Manager)
                         .Include(m => m.Developer)
                         .Include(m => m.Manager.User)
@@ -125,10 +115,6 @@ namespace TaskManagmentApi.Services.Services
                         .Include(m => m.Status)
                         .Where(c => c.DeveloperId.Equals(developerId));
                 return mattersByClient.Select(c => new TaskManagerMapper().Map(c)).ToList();
-            }
-            catch {
-                return null;
-            }
         }
     }
 }
